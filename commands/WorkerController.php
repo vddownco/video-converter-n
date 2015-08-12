@@ -29,10 +29,13 @@ class WorkerController extends Controller
         {
             return false;
         }
-        $convertingVideoAmount = Video::find()->where( [ 'status' => VideoStatus::CONVERTING ] )->count();
-        if ( $convertingVideoAmount >= Video::MAX_CONVERTING_VIDEO_AMOUNT )
+        if ( $action->id == 'convert' )
         {
-            return false;
+            $convertingVideoAmount = Video::find()->where( [ 'status' => VideoStatus::CONVERTING ] )->count();
+            if ( $convertingVideoAmount >= Video::MAX_CONVERTING_VIDEO_AMOUNT )
+            {
+                return false;
+            }
         }
         return true;
     }
@@ -47,29 +50,29 @@ class WorkerController extends Controller
         {
             $video = Video::findOne( $id );
         }
-        $video->status = VideoStatus::CONVERTING;
-        if ( !$video->save( false, [ 'status' ] ) )
+        if ( $video === null )
+        {
+            return;
+        }
+        if ( !$video->saveStatus( VideoStatus::CONVERTING ) )
         {
             throw new ErrorException( $video->getFirstError() );
         }
-        $fileName = $video->getVideoName( 'mp4' );
-        $convertedVideo = new Video();
-        $convertedVideo->userId = $video->userId;
-        $convertedVideo->originalId = $video->id;
-        $saveFilePath = $convertedVideo->generateSaveFilePath( $fileName );
+        $convertVideoFileName = $video->getVideoName( 'mp4' );
+        $convertVideo = new Video( $video->userId );
+        $convertVideo->originalId = $video->id;
+        $saveFilePath = $convertVideo->generateSaveFilePath( $convertVideoFileName );
         $converter = new FFMpegConverter();
         $converter->convert( $video->getVideoPath(), $saveFilePath );
         $info = $converter->getInfo( $saveFilePath );
-        $convertedVideo->setInfo( $info );
-        $convertedVideo->status = VideoStatus::NO_ACTION;
-        if ( !$convertedVideo->save() )
+        $convertVideo->setInfo( $info );
+        $convertVideo->status = VideoStatus::NO_ACTION;
+        if ( !$convertVideo->save() )
         {
-            $video->status = VideoStatus::CONVERSION_ERROR;
-            $video->save( false, [ 'status' ] );
+            $video->saveStatus( VideoStatus::CONVERTING_ERROR );
             throw new ErrorException( $video->getFirstError() );
         }
-        $video->status = VideoStatus::NO_ACTION;
-        if ( !$video->save( false, [ 'status' ] ) )
+        if ( $video->saveStatus( VideoStatus::NO_ACTION ) )
         {
             throw new ErrorException( $video->getFirstError() );
         }

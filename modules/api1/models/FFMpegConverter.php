@@ -19,10 +19,10 @@ class FFMpegConverter extends Model
         $this->_ffmpeg = FFMpeg::create( $config );
     }
 
-    public function convert( $filePath, $convertedFilePath )
+    public function convert( $filePath, $convertFilePath )
     {
         $video = $this->_ffmpeg->open( $filePath );
-        $video->save( new X264( 'libmp3lame' ), $convertedFilePath );
+        $video->save( new X264( 'libmp3lame' ), $convertFilePath );
     }
 
     public function getInfo( $filePath )

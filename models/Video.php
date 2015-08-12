@@ -2,9 +2,11 @@
 
 namespace app\models;
 
+use app\modules\api1\models\Uploader;
 use app\modules\api1\models\VideoInfo;
 use app\records\VideoRecord;
 use Yii;
+use yii\base\InvalidConfigException;
 
 /**
  * Class Video
@@ -24,6 +26,12 @@ use Yii;
 class Video extends VideoRecord
 {
     const MAX_CONVERTING_VIDEO_AMOUNT = 5;
+
+    public function __construct( $userId )
+    {
+        $this->userId = $userId;
+        parent::__construct();
+    }
 
     public function fields()
     {
@@ -101,6 +109,12 @@ class Video extends VideoRecord
         $this->height = $info->height;
         $this->audioBitrate = $info->audioBitrate;
         $this->videoBitrate = $info->videoBitrate;
+    }
+
+    public function saveStatus( $status )
+    {
+        $this->status = $status;
+        return $this->save( true, [ 'status' ] );
     }
 
     public function getUserId()

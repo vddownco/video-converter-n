@@ -23,8 +23,7 @@ class VideoController extends BaseController
     public function actionUpload()
     {
         $file = UploadedFile::getInstanceByName( 'file' );
-        $video = new Video();
-        $video->userId = $this->user->id;
+        $video = new Video($this->user->id);
         $saveFilePath = $video->generateSaveFilePath( $file->name );
         $uploader = new Uploader();
         if ( !$uploader->save( $file, $saveFilePath ) )
@@ -34,7 +33,7 @@ class VideoController extends BaseController
         $converter = new FFMpegConverter();
         $info = $converter->getInfo( $saveFilePath );
         $video->setInfo( $info );
-        $video->status = VideoStatus::NO_ACTION;
+        $video->status = VideoStatus::NEED_CONVERT;
         if ( !$video->save() )
         {
             throw new ServerErrorHttpException( $video->getFirstError() );
