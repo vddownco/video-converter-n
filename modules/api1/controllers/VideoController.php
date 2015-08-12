@@ -3,7 +3,7 @@
 namespace app\modules\api1\controllers;
 
 use app\models\Video;
-use app\models\VideoStatus;
+use app\enums\VideoStatus;
 use app\modules\api1\models\ConsoleRunner;
 use app\modules\api1\models\FFMpegConverter;
 use app\modules\api1\models\Uploader;

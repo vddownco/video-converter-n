@@ -8,10 +8,9 @@
 namespace app\commands;
 
 use app\models\Video;
-use app\models\VideoStatus;
+use app\enums\VideoStatus;
 use app\modules\api1\models\FFMpegConverter;
 use yii\base\ErrorException;
-use yii\base\Exception;
 use yii\console\Controller;
 
 /**
