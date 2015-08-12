@@ -16,7 +16,7 @@ class VideoController extends BaseController
     public function actionView( $id )
     {
         $video = Video::findOne( $id );
-        $this->checkAccess( $this->action, $video );
+        $this->checkAccess( $video );
         return $video;
     }
 
@@ -46,7 +46,7 @@ class VideoController extends BaseController
     public function actionDownload( $id )
     {
         $video = Video::findOne( $id );
-        $this->checkAccess( $this->action, $video );
+        $this->checkAccess( $video );
         \Yii::$app->response->sendFile( $video->getVideoPath(), $video->name );
     }
 
@@ -59,16 +59,16 @@ class VideoController extends BaseController
     public function actionDelete( $id )
     {
         $video = Video::findOne( $id );
-        $this->checkAccess( $this->action, $video );
+        $this->checkAccess( $video );
         if ( !$video->delete() )
         {
             throw new ServerErrorHttpException( $video->getFirstError() );
         }
     }
 
-    public function checkAccess( $action, $model, $params = [] )
+    private function checkAccess( Video $video )
     {
-        if ( ( $model === null ) || ( $model->userId != $this->user->id ) )
+        if ( ( $video === null ) || ( $video->userId != $this->user->id ) )
         {
             throw new ForbiddenHttpException( 'You are not allowed to perform this action.' );
         }
