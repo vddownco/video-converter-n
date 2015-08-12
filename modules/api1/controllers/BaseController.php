@@ -38,6 +38,10 @@ class BaseController extends Controller
 
     public function getUser( $username, $password )
     {
-        return User::findOne( [ 'username' => $username, 'password' => $password ] );
+        $user = User::findOne( [ 'username' => $username ] );
+        if ( ( $user === null ) || !$user->isValidPassword( $password ) ) {
+            return null;
+        }
+        return $user;
     }
 }

@@ -2,13 +2,15 @@
 
 namespace app\modules\api1\models;
 
+use app\components\base\Model;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;
 use FFMpeg\Format\Video\X264;
-use yii\base\Model;
 
 class FFMpegConverter extends Model
 {
+    const AUDIO_CODEC = 'libmp3lame';
+
     /**
      * @var FFMpeg
      */
@@ -19,22 +21,47 @@ class FFMpegConverter extends Model
         $this->_ffmpeg = FFMpeg::create( $config );
     }
 
-    public function convert( $filePath, $convertedFilePath )
+    /**
+     * Convert video to mp4 and save in $convertFilePath
+     * @param $filePath
+     * @param $convertFilePath
+     * @return bool
+     */
+    public function convertToMp4( $filePath, $convertFilePath )
     {
-        $video = $this->_ffmpeg->open( $filePath );
-        return $video->save( new X264( 'libmp3lame' ), $convertedFilePath );
+        try
+        {
+            $video = $this->_ffmpeg->open( $filePath );
+            $video->save( new X264( self::AUDIO_CODEC ), $convertFilePath );
+            return true;
+        }
+        catch (\Exception $e)
+        {
+            $this->addError( 'video', $e->getMessage() );
+            return false;
+        }
     }
 
+    /**
+     * Get information about file
+     * @param $filePath
+     * @return VideoInfo
+     */
     public function getInfo( $filePath )
     {
         $streams = $this->_ffmpeg->getFFProbe()->streams( $filePath );
         $videoStream = $streams->videos()->first();
         $audioStream = $streams->audios()->first();
-        return [
-            'width' => $videoStream->get( 'width' ),
-            'height' => $videoStream->get( 'height' ),
-            'videoBitrate' => round($videoStream->get( 'bit_rate' ) / 1024),
-            'audioBitrate' => round($audioStream->get( 'bit_rate' ) / 1024)
-        ];
+        return new VideoInfo(
+            $videoStream->get( 'width' ),
+            $videoStream->get( 'height' ),
+            $this->convertBirtateToKbps( $videoStream->get( 'bit_rate' ) ),
+            $this->convertBirtateToKbps( $audioStream->get( 'bit_rate' ) )
+        );
+    }
+
+    private function convertBirtateToKbps( $bps )
+    {
+        return round( $bps / 1024 );
     }
 }

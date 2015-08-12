@@ -1,12 +1,11 @@
 <?php
 
-namespace app\models;
+namespace app\enums;
 
-class VideoStatus
+abstract class VideoStatus
 {
     const NO_ACTION = 0;
     const NEED_CONVERT = 1;
     const CONVERTING = 2;
-    const CONVERSION_ERROR = 3;
-
+    const CONVERTING_ERROR = 3;
 }

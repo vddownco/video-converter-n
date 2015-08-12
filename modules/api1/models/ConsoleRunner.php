@@ -21,11 +21,11 @@ class ConsoleRunner extends Object
         ]);
         if ( $this->isWindows() )
         {
-            pclose( popen( 'start /b ' . $cmd, 'r' ));
+            pclose( popen( 'start /b ' . $cmd, 'r' ) );
         }
         else
         {
-            pclose( popen( $cmd . ' > /dev/null &', 'r' ));
+            pclose( popen( $cmd . ' > /dev/null &', 'r' ) );
         }
         return true;
     }
