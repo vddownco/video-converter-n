@@ -8,10 +8,17 @@ use yii\web\IdentityInterface;
 
 class User extends UserRecord implements IdentityInterface
 {
+    /**
+     * Verifies a password
+     * @param $password
+     * @return bool
+     * @throws \yii\base\InvalidConfigException
+     */
     public function isValidPassword( $password )
     {
         return \Yii::$app->security->validatePassword( $password, $this->password );
     }
+
     /**
      * Finds an identity by the given ID.
      * @param string|integer $id the ID to be looked for

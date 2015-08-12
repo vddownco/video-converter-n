@@ -2,10 +2,10 @@
 
 namespace app\modules\api1\models;
 
+use app\components\base\Model;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;
 use FFMpeg\Format\Video\X264;
-use yii\base\Model;
 
 class FFMpegConverter extends Model
 {
@@ -19,12 +19,32 @@ class FFMpegConverter extends Model
         $this->_ffmpeg = FFMpeg::create( $config );
     }
 
-    public function convert( $filePath, $convertFilePath )
+    /**
+     * Convert video to mp4 and save in $convertFilePath
+     * @param $filePath
+     * @param $convertFilePath
+     * @return bool
+     */
+    public function convertToMp4( $filePath, $convertFilePath )
     {
-        $video = $this->_ffmpeg->open( $filePath );
-        $video->save( new X264( 'libmp3lame' ), $convertFilePath );
+        try
+        {
+            $video = $this->_ffmpeg->open( $filePath );
+            $video->save( new X264( 'libmp3lame' ), $convertFilePath );
+            return true;
+        }
+        catch (\Exception $e)
+        {
+            $this->addError( 'video', $e->getMessage() );
+            return false;
+        }
     }
 
+    /**
+     * Get information about file
+     * @param $filePath
+     * @return VideoInfo
+     */
     public function getInfo( $filePath )
     {
         $streams = $this->_ffmpeg->getFFProbe()->streams( $filePath );

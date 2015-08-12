@@ -63,7 +63,10 @@ class WorkerController extends Controller
         $convertVideo->originalId = $video->id;
         $saveFilePath = $convertVideo->generateSaveFilePath( $convertVideoFileName );
         $converter = new FFMpegConverter();
-        $converter->convert( $video->getVideoPath(), $saveFilePath );
+        if ( !$converter->convertToMp4( $video->getVideoPath(), $saveFilePath ) )
+        {
+            throw new ErrorException( $converter->getFirstError() );
+        }
         $info = $converter->getInfo( $saveFilePath );
         $convertVideo->setInfo( $info );
         $convertVideo->status = VideoStatus::NO_ACTION;

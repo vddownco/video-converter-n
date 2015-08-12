@@ -2,7 +2,7 @@
 
 namespace app\modules\api1\models;
 
-use yii\base\Model;
+use app\components\base\Model;
 use yii\validators\FileValidator;
 
 /**
@@ -22,11 +22,12 @@ class Uploader extends Model
     }
 
     /**
+     * Validate uploaded file and save it.
      * @param \yii\web\UploadedFile $file
      * @param string $saveFilePath
      * @return bool
      */
-    public function save ( $file, $saveFilePath )
+    public function save( $file, $saveFilePath )
     {
         $error = null;
         if ( !$this->_validator->validate( $file, $error ) )
@@ -40,19 +41,5 @@ class Uploader extends Model
             return false;
         }
         return true;
-    }
-
-    public function getFirstError( $attribute = null )
-    {
-        if ( $attribute !== null )
-        {
-            return parent::getFirstError( $attribute );
-        }
-        elseif ( isset( $this->errors ) )
-        {
-            $values = array_values( $this->errors );
-            return $values[0][0];
-        }
-        return null;
     }
 }

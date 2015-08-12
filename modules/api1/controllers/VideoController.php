@@ -65,6 +65,11 @@ class VideoController extends BaseController
         }
     }
 
+    /**
+     * Checks whether the user is the author of the video
+     * @param Video $video
+     * @throws ForbiddenHttpException
+     */
     private function checkAccess( Video $video )
     {
         if ( ( $video === null ) || ( $video->userId != $this->user->id ) )

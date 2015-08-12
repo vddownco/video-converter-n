@@ -2,11 +2,9 @@
 
 namespace app\models;
 
-use app\modules\api1\models\Uploader;
 use app\modules\api1\models\VideoInfo;
 use app\records\VideoRecord;
 use Yii;
-use yii\base\InvalidConfigException;
 
 /**
  * Class Video
@@ -25,21 +23,29 @@ use yii\base\InvalidConfigException;
  */
 class Video extends VideoRecord
 {
-    const MAX_CONVERTING_VIDEO_AMOUNT = 5;
-
     public function __construct( $userId )
     {
         $this->userId = $userId;
         parent::__construct();
     }
 
+    /**
+     * Returns the list of fields that should be returned by toArray().
+     * @inheritdoc
+     */
     public function fields()
     {
         $fields = parent::fields();
+        // Field 'saveName' used as internal variable and should not return in a response
         unset( $fields[ 'saveName' ] );
         return $fields;
     }
 
+    /**
+     * Delete record and file that associated with record
+     * @return bool
+     * @throws \Exception
+     */
     public function delete()
     {
         $filePath = $this->getVideoPath();
@@ -56,6 +62,12 @@ class Video extends VideoRecord
         return true;
     }
 
+    /**
+     * Generate save path for video with name $fileName.
+     * Set name and saveName record attributes.
+     * @param $fileName
+     * @return string
+     */
     public function generateSaveFilePath( $fileName )
     {
         $this->name = $fileName;
@@ -79,21 +91,36 @@ class Video extends VideoRecord
         return null;
     }
 
+    /**
+     * Get video path
+     * @return string
+     */
     public function getVideoPath()
     {
         return $this->getFilePath( $this->saveName );
     }
 
-    public function getVideoName($withExtension = false)
+    /**
+     * Get video file name without extension.
+     * If set $withExtension return file name with extension $withExtension.
+     * @param string|null $withExtension
+     * @return mixed|string
+     */
+    public function getVideoName($withExtension = null)
     {
         $name = pathinfo( $this->name, PATHINFO_FILENAME );
-        if ( $withExtension !== false)
+        if ( $withExtension !== null)
         {
             $name .= '.' . $withExtension;
         }
         return $name;
     }
 
+    /**
+     * Get file path with name $namme
+     * @param string $name File name with extension
+     * @return string
+     */
     public function getFilePath( $name )
     {
         return strtr( '{webroot}/content/{userId}/{name}', [
