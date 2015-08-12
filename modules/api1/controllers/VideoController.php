@@ -7,8 +7,6 @@ use app\models\VideoStatus;
 use app\modules\api1\models\ConsoleRunner;
 use app\modules\api1\models\FFMpegConverter;
 use app\modules\api1\models\Uploader;
-use yii\helpers\Console;
-use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
@@ -39,7 +37,7 @@ class VideoController extends BaseController
         ];
         if ( !$video->save() )
         {
-            throw new BadRequestHttpException( $video->getFirstError() );
+            throw new ServerErrorHttpException( $video->getFirstError() );
         }
         (new ConsoleRunner())->run( 'worker/convert ' . $video->id );
         return $video;
