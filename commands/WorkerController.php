@@ -32,7 +32,7 @@ class WorkerController extends Controller
         if ( $action->id == 'convert' )
         {
             $convertingVideoAmount = Video::find()->where( [ 'status' => VideoStatus::CONVERTING ] )->count();
-            if ( $convertingVideoAmount >= Video::MAX_CONVERTING_VIDEO_AMOUNT )
+            if ( $convertingVideoAmount >= \Yii::$app->params[ 'max_converting_video_amount' ] )
             {
                 return false;
             }
