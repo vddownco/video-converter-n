@@ -24,7 +24,7 @@ class Video extends VideoRecord
             $this->addError( 'file', 'File could not be removed' );
             return false;
         }
-        if ( parent::delete() )
+        if ( !parent::delete() )
         {
             $this->addError( 'file', 'Record could not be deleted' );
             return false;
