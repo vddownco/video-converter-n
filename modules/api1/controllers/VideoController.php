@@ -26,15 +26,15 @@ class VideoController extends BaseController
         $video = new Video();
         $video->userId = $this->user->id;
         $saveFilePath = $video->generateSaveFilePath( $file->name );
-        (new Uploader())->save( $file, $saveFilePath );
-        $info = (new FFMpegConverter())->getInfo( $saveFilePath );
-        $video->attributes = [
-            'width' => $info[ 'width' ],
-            'height' => $info[ 'height' ],
-            'audioBitrate' => $info[ 'audioBitrate' ],
-            'videoBitrate' => $info[ 'videoBitrate' ],
-            'status' => VideoStatus::NEED_CONVERT
-        ];
+        $uploader = new Uploader();
+        if ( !$uploader->save( $file, $saveFilePath ) )
+        {
+            throw new ServerErrorHttpException( $uploader->getFirstError() );
+        }
+        $converter = new FFMpegConverter();
+        $info = $converter->getInfo( $saveFilePath );
+        $video->setInfo( $info );
+        $video->status = VideoStatus::NO_ACTION;
         if ( !$video->save() )
         {
             throw new ServerErrorHttpException( $video->getFirstError() );

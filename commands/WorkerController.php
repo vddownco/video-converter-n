@@ -53,7 +53,7 @@ class WorkerController extends Controller
         {
             throw new ErrorException( $video->getFirstError() );
         }
-        $fileName = $video->getVideoName() . '.mp4';
+        $fileName = $video->getVideoName( 'mp4' );
         $convertedVideo = new Video();
         $convertedVideo->userId = $video->userId;
         $convertedVideo->originalId = $video->id;
@@ -61,13 +61,8 @@ class WorkerController extends Controller
         $converter = new FFMpegConverter();
         $converter->convert( $video->getVideoPath(), $saveFilePath );
         $info = $converter->getInfo( $saveFilePath );
-        $convertedVideo->attributes = [
-            'width' => $info[ 'width' ],
-            'height' => $info[ 'height' ],
-            'audioBitrate' => $info[ 'audioBitrate' ],
-            'videoBitrate' => $info[ 'videoBitrate' ],
-            'status' => VideoStatus::NO_ACTION
-        ];
+        $convertedVideo->setInfo( $info );
+        $convertedVideo->status = VideoStatus::NO_ACTION;
         if ( !$convertedVideo->save() )
         {
             $video->status = VideoStatus::CONVERSION_ERROR;

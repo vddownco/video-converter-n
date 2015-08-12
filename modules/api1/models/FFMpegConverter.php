@@ -22,7 +22,7 @@ class FFMpegConverter extends Model
     public function convert( $filePath, $convertedFilePath )
     {
         $video = $this->_ffmpeg->open( $filePath );
-        return $video->save( new X264( 'libmp3lame' ), $convertedFilePath );
+        $video->save( new X264( 'libmp3lame' ), $convertedFilePath );
     }
 
     public function getInfo( $filePath )
@@ -30,11 +30,16 @@ class FFMpegConverter extends Model
         $streams = $this->_ffmpeg->getFFProbe()->streams( $filePath );
         $videoStream = $streams->videos()->first();
         $audioStream = $streams->audios()->first();
-        return [
-            'width' => $videoStream->get( 'width' ),
-            'height' => $videoStream->get( 'height' ),
-            'videoBitrate' => round($videoStream->get( 'bit_rate' ) / 1024),
-            'audioBitrate' => round($audioStream->get( 'bit_rate' ) / 1024)
-        ];
+        return new VideoInfo(
+            $videoStream->get( 'width' ),
+            $videoStream->get( 'height' ),
+            $this->convertBirtateToKbps( $videoStream->get( 'bit_rate' ) ),
+            $this->convertBirtateToKbps( $audioStream->get( 'bit_rate' ) )
+        );
+    }
+
+    private function convertBirtateToKbps( $bps )
+    {
+        return round( $bps / 1024 );
     }
 }

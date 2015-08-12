@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\modules\api1\models\VideoInfo;
 use app\records\VideoRecord;
 use Yii;
 
@@ -75,9 +76,14 @@ class Video extends VideoRecord
         return $this->getFilePath( $this->saveName );
     }
 
-    public function getVideoName()
+    public function getVideoName($withExtension = false)
     {
-        return pathinfo( $this->name, PATHINFO_FILENAME );
+        $name = pathinfo( $this->name, PATHINFO_FILENAME );
+        if ( $withExtension !== false)
+        {
+            $name .= '.' . $withExtension;
+        }
+        return $name;
     }
 
     public function getFilePath( $name )
@@ -87,6 +93,14 @@ class Video extends VideoRecord
             '{userId}' => $this->userId,
             '{name}' => $name,
         ]);
+    }
+
+    public function setInfo( VideoInfo $info )
+    {
+        $this->width = $info->width;
+        $this->height = $info->height;
+        $this->audioBitrate = $info->audioBitrate;
+        $this->videoBitrate = $info->videoBitrate;
     }
 
     public function getUserId()

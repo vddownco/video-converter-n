@@ -41,4 +41,18 @@ class Uploader extends Model
         }
         return true;
     }
+
+    public function getFirstError( $attribute = null )
+    {
+        if ( $attribute !== null )
+        {
+            return parent::getFirstError( $attribute );
+        }
+        elseif ( isset( $this->errors ) )
+        {
+            $values = array_values( $this->errors );
+            return $values[0][0];
+        }
+        return null;
+    }
 }
