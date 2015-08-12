@@ -14,8 +14,8 @@ class m150811_104700_init_db extends Migration
             ],
             'ENGINE=InnoDB DEFAULT CHARSET=utf8'
         );
-        $this->insert( 'user', [ 'username' => 'user1', 'password' => 'pass1' ]);
-        $this->insert( 'user', [ 'username' => 'user2', 'password' => 'pass2' ]);
+        $this->insert( 'user', [ 'username' => 'user1', 'password' => '$2y$13$D.0xAekUKkk8vgkZ/jCzcODv.VNIZx.7/cj0vg9M4aFr5ET3kEhdG' ]);
+        $this->insert( 'user', [ 'username' => 'user2', 'password' => '$2y$13$Ez4FS9NNiap0VlCSRtoq3uCziHwBFUkCMKYp/AHHGbnJjxKyDJ74u' ]);
         $this->createTable( 'video', [
             'id' => 'int(10) NOT NULL AUTO_INCREMENT',
             'user_id' => 'int(10) NOT NULL',
