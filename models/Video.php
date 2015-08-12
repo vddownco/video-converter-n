@@ -29,6 +29,12 @@ class Video extends VideoRecord
         parent::__construct();
     }
 
+    public static function instantiate($row)
+    {
+        $userId = isset($row['user_id']) ? $row['user_id'] : null;
+        return new static($userId);
+    }
+
     /**
      * Returns the list of fields that should be returned by toArray().
      * @inheritdoc
