@@ -68,7 +68,7 @@ class Video extends VideoRecord
     public function getFilePath( $name )
     {
         return strtr( '{webroot}/content/{userId}/{name}', [
-            '{webroot}' => \Yii::$app->basePath.'/web',
+            '{webroot}' => \Yii::$app->basePath . '/web',
             '{userId}' => $this->userId,
             '{name}' => $name,
         ]);
