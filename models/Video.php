@@ -5,6 +5,21 @@ namespace app\models;
 use app\records\VideoRecord;
 use Yii;
 
+/**
+ * Class Video
+ *
+ * @inheritdoc
+ *
+ * @property integer $userId
+ * @property integer $originalId
+ * @property string $saveName
+ * @property integer $videoBitrate
+ * @property integer $audioBitrate
+ *
+ * @method static Video findOne($id)
+ *
+ * @package app\models
+ */
 class Video extends VideoRecord
 {
     const MAX_CONVERTING_VIDEO_AMOUNT = 5;
