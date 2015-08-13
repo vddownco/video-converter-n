@@ -35,7 +35,7 @@ class Video extends VideoRecord
 
     public static function instantiate($row)
     {
-        $userId = isset($row['user_id']) ? $row['user_id'] : null;
+        $userId = isset( $row[ 'user_id' ] ) ? $row[ 'user_id' ] : null;
         return new static($userId);
     }
 

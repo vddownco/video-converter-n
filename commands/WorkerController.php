@@ -8,6 +8,7 @@
 namespace app\commands;
 
 use app\components\helpers\VideoFileHelper;
+use app\enums\FileExtension;
 use app\models\Video;
 use app\enums\VideoStatus;
 use app\modules\api1\models\FFMpegConverter;
@@ -24,13 +25,15 @@ use yii\console\Controller;
  */
 class WorkerController extends Controller
 {
+    const CONVERT_ACTION_ID = 'convert';
+
     public function beforeAction( $action )
     {
         if ( !parent::beforeAction( $action ) )
         {
             return false;
         }
-        if ( $action->id == 'convert' )
+        if ( $action->id == self::CONVERT_ACTION_ID )
         {
             $convertingVideoAmount = Video::find()->where( [ 'status' => VideoStatus::CONVERTING ] )->count();
             if ( $convertingVideoAmount >= \Yii::$app->params[ 'max_converting_video_amount' ] )
@@ -64,12 +67,12 @@ class WorkerController extends Controller
         {
             throw new ErrorException( $video->getFirstError() );
         }
-        $convertVideoName = VideoFileHelper::changeExtension( $video->name, 'mp4' );
-        $convertVideo = new Video( $video->userId );
-        $convertVideo->originalId = $video->id;
-        $convertVideo->name = $convertVideoName;
-        $convertVideo->saveName = VideoFileHelper::generateSaveName( $convertVideoName );
-        $saveFilePath = $convertVideo->getVideoPath();
+        $convertedVideoName = VideoFileHelper::changeExtension( $video->name, FileExtension::MP4 );
+        $convertedVideo = new Video( $video->userId );
+        $convertedVideo->originalId = $video->id;
+        $convertedVideo->name = $convertedVideoName;
+        $convertedVideo->saveName = VideoFileHelper::generateSaveName( $convertedVideoName );
+        $saveFilePath = $convertedVideo->getVideoPath();
         $converter = new FFMpegConverter();
         if ( !$converter->convertToMp4( $video->getVideoPath(), $saveFilePath ) )
         {
@@ -77,9 +80,9 @@ class WorkerController extends Controller
             return Controller::EXIT_CODE_ERROR;
         }
         $info = $converter->getInfo( $saveFilePath );
-        $convertVideo->setInfo( $info );
-        $convertVideo->status = VideoStatus::NO_ACTION;
-        if ( !$convertVideo->save() )
+        $convertedVideo->setInfo( $info );
+        $convertedVideo->status = VideoStatus::NO_ACTION;
+        if ( !$convertedVideo->save() )
         {
             $this->handleError( $converter->getFirstError() );
             return Controller::EXIT_CODE_ERROR;

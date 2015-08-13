@@ -3,6 +3,7 @@
 namespace app\modules\api1\controllers;
 
 use app\components\helpers\VideoFileHelper;
+use app\enums\ConsoleCommand;
 use app\models\Video;
 use app\enums\VideoStatus;
 use app\modules\api1\models\ConsoleRunner;
@@ -14,6 +15,8 @@ use yii\web\UploadedFile;
 
 class VideoController extends BaseController
 {
+    const UPLOAD_FILE_PARAMETER = 'file';
+
     public function actionView( $id )
     {
         $video = Video::findOne( $id );
@@ -23,7 +26,7 @@ class VideoController extends BaseController
 
     public function actionUpload()
     {
-        $file = UploadedFile::getInstanceByName( 'file' );
+        $file = UploadedFile::getInstanceByName( self::UPLOAD_FILE_PARAMETER );
         if ( $file === null )
         {
             throw new ServerErrorHttpException( 'Please upload a file.' );
@@ -45,7 +48,7 @@ class VideoController extends BaseController
         {
             throw new ServerErrorHttpException( $video->getFirstError() );
         }
-        (new ConsoleRunner())->run( 'worker/convert ' . $video->id );
+        (new ConsoleRunner())->run( ConsoleCommand::CONVERT, [ $video->id ] );
         return $video;
     }
 

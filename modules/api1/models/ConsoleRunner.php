@@ -13,11 +13,12 @@ class ConsoleRunner extends Object
         $this->_yiiPath = \Yii::$app->basePath . DIRECTORY_SEPARATOR . 'yii';
     }
 
-    public function run( $command )
+    public function run( $command, $arguments )
     {
-        $cmd = strtr( 'php {yii} {command}', [
+        $cmd = strtr( 'php {yii} {command} {arguments}', [
             '{yii}' => $this->_yiiPath,
-            '{command}' => $command
+            '{command}' => $command,
+            '{arguments}' => implode(' ', $arguments)
         ]);
         if ( $this->isWindows() )
         {

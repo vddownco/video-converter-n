@@ -3,6 +3,7 @@
 namespace app\modules\api1\models;
 
 use app\components\traits\ModelHelperTrait;
+use app\enums\FileExtension;
 use yii\base\Model;
 use yii\validators\FileValidator;
 
@@ -15,13 +16,15 @@ use yii\validators\FileValidator;
  */
 class Uploader extends Model
 {
+    const FILE_EXTENSIONS = FileExtension::FLV;
+
     use ModelHelperTrait;
 
     private $_validator;
 
     public function init()
     {
-        $this->_validator = new FileValidator( [ 'skipOnEmpty' => false, 'extensions' => 'flv' ] );
+        $this->_validator = new FileValidator( [ 'skipOnEmpty' => false, 'extensions' => self::FILE_EXTENSIONS ] );
     }
 
     /**
