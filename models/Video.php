@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\traits\ModelHelperTrait;
 use app\modules\api1\models\VideoInfo;
 use app\records\VideoRecord;
 use Yii;
@@ -23,6 +24,8 @@ use Yii;
  */
 class Video extends VideoRecord
 {
+    use ModelHelperTrait;
+
     public function __construct( $userId )
     {
         $this->userId = $userId;
@@ -81,20 +84,6 @@ class Video extends VideoRecord
         $extension = pathinfo( $fileName, PATHINFO_EXTENSION );
         $this->saveName = $baseName . '.' . time() . '.' . $extension;
         return $this->getFilePath( $this->saveName );
-    }
-
-    public function getFirstError( $attribute = null )
-    {
-        if ( $attribute !== null )
-        {
-            return parent::getFirstError( $attribute );
-        }
-        elseif ( isset( $this->errors ) )
-        {
-            $values = array_values( $this->errors );
-            return $values[0][0];
-        }
-        return null;
     }
 
     /**

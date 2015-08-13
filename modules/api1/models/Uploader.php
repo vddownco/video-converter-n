@@ -2,7 +2,8 @@
 
 namespace app\modules\api1\models;
 
-use app\components\base\Model;
+use app\components\traits\ModelHelperTrait;
+use yii\base\Model;
 use yii\validators\FileValidator;
 
 /**
@@ -14,6 +15,8 @@ use yii\validators\FileValidator;
  */
 class Uploader extends Model
 {
+    use ModelHelperTrait;
+
     private $_validator;
 
     public function init()

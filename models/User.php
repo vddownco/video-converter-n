@@ -3,7 +3,6 @@
 namespace app\models;
 
 use app\records\UserRecord;
-use Yii;
 use yii\web\IdentityInterface;
 
 class User extends UserRecord implements IdentityInterface

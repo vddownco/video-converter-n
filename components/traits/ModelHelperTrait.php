@@ -1,11 +1,11 @@
 <?php
 
-namespace app\components\base;
+namespace app\components\traits;
 
-class Model extends \yii\base\Model
+trait ModelHelperTrait
 {
     /**
-     * Get first error from model or first error of the specified attribute.
+     * Get first error from model. If set $attribute get first error of the specified attribute.
      * @param null|string $attribute
      * @return null|string
      */
@@ -15,7 +15,7 @@ class Model extends \yii\base\Model
         {
             return parent::getFirstError( $attribute );
         }
-        elseif ( isset( $this->errors ) )
+        elseif ( $this->hasErrors() )
         {
             $values = array_values( $this->errors );
             return $values[0][0];

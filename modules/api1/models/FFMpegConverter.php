@@ -2,13 +2,16 @@
 
 namespace app\modules\api1\models;
 
-use app\components\base\Model;
+use app\components\traits\ModelHelperTrait;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;
 use FFMpeg\Format\Video\X264;
+use yii\base\Model;
 
 class FFMpegConverter extends Model
 {
+    use ModelHelperTrait;
+
     const AUDIO_CODEC = 'libmp3lame';
 
     /**
