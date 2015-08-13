@@ -7,6 +7,7 @@
 
 namespace app\commands;
 
+use app\components\helpers\VideoFileHelper;
 use app\models\Video;
 use app\enums\VideoStatus;
 use app\modules\api1\models\FFMpegConverter;
@@ -45,39 +46,55 @@ class WorkerController extends Controller
         if ( $id === null )
         {
             $video = Video::find()->where( [ 'status' => VideoStatus::NEED_CONVERT ] )->one();
+            if ( $video === null )
+            {
+                return Controller::EXIT_CODE_NORMAL;
+            }
         }
         else
         {
             $video = Video::findOne( $id );
-        }
-        if ( $video === null )
-        {
-            return;
+            if ( $video === null )
+            {
+                $this->handleError( "Video with id = '$id' not found." );
+                return Controller::EXIT_CODE_ERROR;
+            }
         }
         if ( !$video->saveStatus( VideoStatus::CONVERTING ) )
         {
             throw new ErrorException( $video->getFirstError() );
         }
-        $convertVideoFileName = $video->getVideoName( 'mp4' );
+        $convertVideoName = VideoFileHelper::changeExtension( $video->name, 'mp4' );
         $convertVideo = new Video( $video->userId );
         $convertVideo->originalId = $video->id;
-        $saveFilePath = $convertVideo->generateSaveFilePath( $convertVideoFileName );
+        $convertVideo->name = $convertVideoName;
+        $convertVideo->saveName = VideoFileHelper::generateSaveName( $convertVideoName );
+        $saveFilePath = $convertVideo->getVideoPath();
         $converter = new FFMpegConverter();
         if ( !$converter->convertToMp4( $video->getVideoPath(), $saveFilePath ) )
         {
-            throw new ErrorException( $converter->getFirstError() );
+            $this->handleError( $converter->getFirstError() );
+            return Controller::EXIT_CODE_ERROR;
         }
         $info = $converter->getInfo( $saveFilePath );
         $convertVideo->setInfo( $info );
         $convertVideo->status = VideoStatus::NO_ACTION;
         if ( !$convertVideo->save() )
         {
-            $video->saveStatus( VideoStatus::CONVERTING_ERROR );
-            throw new ErrorException( $video->getFirstError() );
+            $this->handleError( $converter->getFirstError() );
+            return Controller::EXIT_CODE_ERROR;
         }
         if ( $video->saveStatus( VideoStatus::NO_ACTION ) )
         {
-            throw new ErrorException( $video->getFirstError() );
+            $this->handleError( $converter->getFirstError() );
+            return Controller::EXIT_CODE_ERROR;
         }
+        return Controller::EXIT_CODE_NORMAL;
+    }
+
+    private function handleError( $error )
+    {
+        echo 'Error: ' . $error;
+        \Yii::error( $error );
     }
 }
