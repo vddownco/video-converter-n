@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\helpers\VideoFileHelper;
 use app\components\traits\ModelHelperTrait;
 use app\modules\api1\models\VideoInfo;
 use app\records\VideoRecord;
@@ -72,57 +73,12 @@ class Video extends VideoRecord
     }
 
     /**
-     * Generate save path for video with name $fileName.
-     * Set name and saveName record attributes.
-     * @param $fileName
-     * @return string
-     */
-    public function generateSaveFilePath( $fileName )
-    {
-        $this->name = $fileName;
-        $baseName = pathinfo( $fileName, PATHINFO_FILENAME );
-        $extension = pathinfo( $fileName, PATHINFO_EXTENSION );
-        $this->saveName = $baseName . '.' . time() . '.' . $extension;
-        return $this->getFilePath( $this->saveName );
-    }
-
-    /**
      * Get video path
      * @return string
      */
     public function getVideoPath()
     {
-        return $this->getFilePath( $this->saveName );
-    }
-
-    /**
-     * Get video file name without extension.
-     * If set $withExtension return file name with extension $withExtension.
-     * @param string|null $withExtension
-     * @return mixed|string
-     */
-    public function getVideoName($withExtension = null)
-    {
-        $name = pathinfo( $this->name, PATHINFO_FILENAME );
-        if ( $withExtension !== null)
-        {
-            $name .= '.' . $withExtension;
-        }
-        return $name;
-    }
-
-    /**
-     * Get file path with name $namme
-     * @param string $name File name with extension
-     * @return string
-     */
-    public function getFilePath( $name )
-    {
-        return strtr( '{webroot}/content/{userId}/{name}', [
-            '{webroot}' => \Yii::$app->basePath . '/web',
-            '{userId}' => $this->userId,
-            '{name}' => $name,
-        ]);
+        return VideoFileHelper::getPath( $this->userId, $this->saveName );
     }
 
     public function setInfo( VideoInfo $info )

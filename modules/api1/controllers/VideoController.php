@@ -2,6 +2,7 @@
 
 namespace app\modules\api1\controllers;
 
+use app\components\helpers\VideoFileHelper;
 use app\models\Video;
 use app\enums\VideoStatus;
 use app\modules\api1\models\ConsoleRunner;
@@ -23,8 +24,14 @@ class VideoController extends BaseController
     public function actionUpload()
     {
         $file = UploadedFile::getInstanceByName( 'file' );
+        if ( $file === null )
+        {
+            throw new ServerErrorHttpException( 'Please upload a file.' );
+        }
         $video = new Video($this->user->id);
-        $saveFilePath = $video->generateSaveFilePath( $file->name );
+        $video->name = $file->name;
+        $video->saveName = VideoFileHelper::generateSaveName( $file->name );
+        $saveFilePath = $video->getVideoPath();
         $uploader = new Uploader();
         if ( !$uploader->save( $file, $saveFilePath ) )
         {
