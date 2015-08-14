@@ -31,17 +31,17 @@ class VideoController extends BaseController
         {
             throw new ServerErrorHttpException( 'Please upload a file.' );
         }
-        $video = new Video($this->user->id);
+        $video = new Video( $this->user->id );
         $video->name = $file->name;
         $video->saveName = VideoFileHelper::generateSaveName( $file->name );
-        $saveFilePath = $video->getVideoPath();
+        $videoPath = $video->getVideoPath();
         $uploader = new Uploader();
-        if ( !$uploader->save( $file, $saveFilePath ) )
+        if ( !$uploader->save( $file, $videoPath ) )
         {
             throw new ServerErrorHttpException( $uploader->getFirstError() );
         }
         $converter = new FFMpegConverter();
-        $info = $converter->getInfo( $saveFilePath );
+        $info = $converter->getInfo( $videoPath );
         $video->setInfo( $info );
         $video->status = VideoStatus::NEED_CONVERT;
         if ( !$video->save() )
