@@ -87,7 +87,7 @@ class WorkerController extends Controller
             $this->handleError( $converter->getFirstError() );
             return Controller::EXIT_CODE_ERROR;
         }
-        if ( $video->saveStatus( VideoStatus::NO_ACTION ) )
+        if ( !$video->saveStatus( VideoStatus::NO_ACTION ) )
         {
             $this->handleError( $converter->getFirstError() );
             return Controller::EXIT_CODE_ERROR;
