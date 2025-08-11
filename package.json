@@ -1,0 +1,12 @@
+{
+  "name": "video-converter",
+  "version": "1.0.0",
+  "description": "REST-service for converting flv to mp4",
+  "scripts": {
+    "build": "echo 'No build process required for PHP application'",
+    "start": "echo 'This is a PHP application - use web server to serve'"
+  },
+  "keywords": ["php", "yii2", "video", "converter"],
+  "author": "",
+  "license": "ISC"
+}
